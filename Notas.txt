@@ -2,6 +2,7 @@
 
 
 Sequência de ataques:
+--------------------------------------------------------------LOGIN------------------------------------------------------------------------
 - ele tentou fazer login utilizando SQL Injection:
 1º ele tentou colocar uma pelica no campo de usermail do login, e apareceu o seguinte erro:
 DB Error, could not query the database
@@ -50,7 +51,68 @@ um utilizador com aquele e-mail (até porque se ele não tivesse encontrado, ia 
 a palavra-passe daquele usermail não era vazia, iria dar certamente "erro de password inválida" ou coisa do género.
 TL;DR: para ele conseguir dar login com apenas uma pelica, é porque ele terá conseguido mudar a palavra-passe para algo "vazio".
 
-6º O atacante 
+6º 119 O atacante conseguiu entrar na conta de administrador utilizando o usermail real e no campo da password=' OR 1=1
+Ok, esta é fácil, vamos lá analisar:
+$sql    = "SELECT session FROM tblMembers WHERE username='" . $_POST['usermail'] . "' AND password='" . $_POST['password'] . "';";
+Lá está, é um AND, ora ambas as condições têm de ser verdadeiras; já sabemos que existe um usermail igual ao que foi introduzido, até porque ele é público;
+relativamente ao campo destinado à palavra-passe, ao colocar pelica ' ele ia estar a "fechar" o campo da procura pela palavra-passe; já deduzimos que
+em princípio nunca existiria na base de dados uma palavra-passe associada a um utilizador, sobretudo ao administrador, que fosse vazia, então vamos supor
+agora que realmente ele anteriormente não chegou a alterar a palavra-passe para vazio - como a palavra-passe associada a esse utilizador é diferente de vazio,
+então ele não conseguiria efetuar login; no entanto, ele colocou à frente uma disjunção e uma condição sempre verdadeira!! Ora, algo OU verdade será sempre verdade, e, por
+isso, no final o query retornará algo verdadeiro e, assim, ele consegue aceder à conta de administração.
+
+7º 125 O atacante conseguiu de novo entrar na conta de administrador utilizando o usermail real e no campo da password=' OR 1=1 -- //
+Eu diria que sinceramente e neste momento o atacante está apenas a experimentar coisas porque ele já conseguiu entrar na conta anteriormente. Este exemplo
+é muito parecido com o anterior, com o acrescento de que ele coloca comentário de forma a reforçar que não haja mais nada no query que possa interferir
+de forma que ele deixe de conseguir efetuar login, isto é, que deixe de fazer com que todo o query seja uma proposição verdadeira.
+
+O erro/warning PHP Warning:  preg_replace(): Unknown modifier 'g' in /var/www/html/footer.php on line 21 nos logs de erro está associado às tentativas de login
+por parte do atacante, pelo menos os tempos coincidem;
+
+Link stackoverflow interessante: https://stackoverflow.com/questions/19061037/warning-preg-replace-unknown-modifier-g
+Basicamente, com o preg_replace() ele por default faz um replace por todas as ocorrências e não apenas, por exemplo, replace na primeira ocorrência que
+encontra; ora, não é necessário colocar na expressão regular g -> global flag porque ele já faz isso.
+CALMA, que eu não tenho bem a certeza se este g é realmente isso... Porque é que ele iria querer substituir um g anyway??
+Não me parece ser um escape.
+
+footer.php
+//$query = $_GET;
+$query = preg_replace("/[<>]/g", "", $_GET);
+$baseurl = $_SERVER['PHP_SELF'];
+$baseurl = preg_replace("/[<>()\"]/", "", $baseurl); -> interessante, há 5 aspas aqui, o que faz com que o resto do documento seja interpretado como uma string!!
+
+-----------------------------------------------------------------------------------------------------------------------
+
+Coisa que achei interessante:
+if (!isset($_COOKIE['level'])) {
+    setcookie("level", "1");
+}
+if (strpos($_SERVER['HTTP_USER_AGENT'], "sqlmap") !== false ||
+strpos($_SERVER['HTTP_USER_AGENT'], "Havij") !== false ||
+strpos($_SERVER['HTTP_USER_AGENT'], "Nikto") !== false ||
+strpos($_SERVER['HTTP_USER_AGENT'], "requests") !== false ||
+strpos($_SERVER['HTTP_USER_AGENT'], "ZAP") !== false ||
+strpos($_SERVER['HTTP_USER_AGENT'], "Burp") !== false ||
+strpos($_SERVER['HTTP_USER_AGENT'], "Metasploit") !== false ||
+strpos($_SERVER['HTTP_USER_AGENT'], "Gecko/20060418 Firefox/1.0.8") !== false) {
+    exit;
+}
+
+será que ele impede que se faça buscas sobre vulnerabilidades do sistema?? Se assim for, poderá ser um mecanismo de confinamento, porque não permite meios de descoberta de vulnerabilidades e, assim, se elas não são descobertas, não são exploradas, certo??
+
+CONTINUAÇÃO
+
+Ele conseguiu aceder à raiz /
+Conseguiu aceder à /products.php?type=1 
+''         ''    '' /products.php?type=2
+Conseguiu aceder ao /info.php, /blog.php e /downloads
+Depois, ele tenta abrir o ficheiro brochure.php: o ficheiro download.php importa o ficheiro getfile.php, e o ficheiro getfile.php é responsável por abrir ficheiros, e era suposto abrir um ficheiro brochure.php, mas este não existe no diretório.
+Eu penso que ele estava a tentar verificar se este ficheiro existia para o abrir e descarregar (por causa do "attachment")
+Também deu erro no log de erros que fclose() recebeu como parâmetro um booleano 1 em vez de uma resource, ora, isto só confirma aquilo que já sabíamos, ele tentou abrir o ficheiro com o fopen() e como não
+conseguiu, a variável de retorno dessa função deu 1 (houve um problema com a função), pelo que fechar esse ficheiro neste caso é "fechar um valor booleano que simboliza que houve um erro".
+
+
+
 
 
 
