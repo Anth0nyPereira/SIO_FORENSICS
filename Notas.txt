@@ -10,6 +10,8 @@ Ora, isto significa que o campo de login é vulnerável a SQL Injection
 Lembrar que pelicas delimitam as strings do query
 O ero tem 5 pelicas seguidas, e podemos interpretar desta forma: existe um erro no sql porque tens ''' do campo do usermail, ou seja, início de string,
 0 chars, fim de string, e início de string (sem fim); depois ainda tens mais 2 pelicas provenientes do campo da password, que é required!! 3 + 2 = 5 IZI
+Podes verificar igualmente no ficheiro login.php, em que ele primeiro verifica na BD se existe um username igual ao usermail introduzido; como é natural,
+não existe um username igual a vazio, por isso, logo aí já daria erro!!
 
 2º ele tentou colocar isto ' -- // no campo do usermail, não deu erro de SQL Injection mas deu erro de "Invalid username, try again"
 Neste caso, ele ao colocar um comentário vai anular a componente da password, pelo que é compreensível que o erro só se queixe do username.
@@ -29,8 +31,26 @@ passado acho que não tinham estes campos com required, isto é, exigiam que fos
 ele comenta o espaço da palavra-passe, a priori significa que o input da palavra-passe deixa de ter qualquer impacto porque é como se não existisse; relativamente
 ao usermail, o atacante insere sempre alguma coisa no input do usermail, por isso nunca vai ser vazio e, por isso, nunca deverá aparecer erro de campo
 a ser preenchido obrigatoriamente, penso eu.
+Eu diria que basicamente, sempre que ele põe por exemplo apenas uma pelica ' ele acaba por procurar por um que seja igual a "vazio", mas como ele preencheu
+o input ele deixa de estar vazio e, então, o required do input html não se queixa.
 
 4º UI, acho que ele modificou a palavra-passe!!
+Ele na tentativa anterior entrou na conta admin recorrendo a sql injection, e como podemos verificar pelo GET obtido, ele entrou na página onde 
+podia criar um post ou mudar as credenciais de acesso; ora, neste POST é possível verificar que ele desta vez entrou com o mail real do admin mas
+entrou com uma palavra-passe "típica" e "básica", "abc", por isso tudo indica que esta tenha sido mudada. Não seria difícil ao atacante descobrir o usermail~
+real, pois este está exposto no servidor na página T&C.
+
+5º POST 112 O atacante conseguiu entrar na conta de administrador utilizando o usermail real e com palavra-passe vazia :OOOOO
+Estou um pouco na dúvida, mas eu diria que ele próprio voltou a mudar a palavra-passe para ser vazia, isto porquê:
+ - se fosse apenas ele recorrer a SQL injection, ao colocar uma pelica significava que ele ia estar à procura de uma conta com palavra-passe "vazia", o que
+é deveras impossível em condições ditas normais existir na base de dados uma conta com palavra-passe vazia... 
+ - ele também não iria conseguir aceder à conta ao colocar na palavra-passe apenas uma pelica ' e colocando o usermail real, porque no ficheiro de login.php,
+a query do usermail e password é um AND, ou seja, ambos os literais têm de ser verdadeiros... ora, ok, ia dar verdadeiro que ele encontrou na base de dados
+um utilizador com aquele e-mail (até porque se ele não tivesse encontrado, ia dar erro de DB Error), mas como não existe uma palavra-passe vazia, ou melhor,
+a palavra-passe daquele usermail não era vazia, iria dar certamente "erro de password inválida" ou coisa do género.
+TL;DR: para ele conseguir dar login com apenas uma pelica, é porque ele terá conseguido mudar a palavra-passe para algo "vazio".
+
+6º O atacante 
 
 
 
