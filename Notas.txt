@@ -166,6 +166,7 @@ var
 vmlinuz
 vmlinuz.old
 "
+https://www.acunetix.com/blog/articles/web-shells-101-using-php-introduction-web-shells-part-2/
 
 Ora bem, vamos lá com calminha: se fores ver o GET /index.php das 10:00:15, vais ver que no lugar de "HackTollKit" está uma web shell inicializada; 
 depois, se fores ver ao whireshark o mesmo GET, vais verificar que no lugar do comando da web shell tens o resultado do comando ls; ora, eu diria
@@ -173,6 +174,17 @@ que então o output é o resultado do comando ls que foi passado como parâmetro
 notar que também no whireshark no GET /display.php?type=1&lang=/var/log/auth.log&cmd=ls%20 aparecem erros de user inválido e o user é
 nada mais nada menos do que o output do ls da máquina!! OMEGUEEEEE
 
+Ora bem, eu não tenho a certeza mas eu diria que o último campo do access.log que supostamente é o "user-agent HTTP" é 
+uma espécie de "utilizador logado" naquele momento. Ora, ele tenta autenticar-se com um user igual à inicialização
+de uma web shell, ou seja, <?php system($_GET["cmd"]);?, e no whireshark ele chega a fazer cmd=ls; naturalmente, não
+existirá nenhum user igual à web shell, mas também não é isso que o atacante pretende; ele ao passar um parâmetro no
+cmd=ls ele vai executar esse comando e vai acabar por aparecer "Invalid user" + todos os diretórios existentes (ls) 
+TL;DR: O que eu quero dizer é, ele na verdade não está à procura de se autenticar verdadeiramente, ele na verdade procura
+estas mensagens de erro que irão, juntamente com elas, mostrar o output dos comandos que ele pretende e, assim, obter mais
+dados e informações.
+
+PERGUNTAR AO PROFESSOR/FALAR COM ELE SOBRE TEORIA DA ALEXANDRA E PERGUNTAR SE O ÚLTIMO CAMPO DO ACCESS.LOG O QUE É
+EXATAMENTE
 
 
 
