@@ -20,6 +20,7 @@ Com esta pelica ele fechou o query do usermail, e basicamente ele recebeu como "
 e por isso o campo da password foi ignorado e o query do usermail foi "fechado", então não houve erro de SQL Syntax!! 
 Ele queixou-se de username inválido! Eu diria que é porque obviamente nunca iria existir na base de dados um utilizador com nome "vazio", ou seja, 
 o query acaba por retornar um valor lógico falso.
+Acho estranho ele não estar a dar erro de DB Error, tendo em conta que na mesma ele está a procurar por um usermail igual a "vazio"!! Como no caso anterior.
 
 3º ele colocou no usermail=' OR 1=1 -- // e conseguiu entrar na conta de admin, mesmo sem nenhuma passe
 Tal como no exemplo anterior, ele comentou o campo da password, não me vou estar a repetir.
@@ -110,6 +111,71 @@ Depois, ele tenta abrir o ficheiro brochure.php: o ficheiro download.php importa
 Eu penso que ele estava a tentar verificar se este ficheiro existia para o abrir e descarregar (por causa do "attachment")
 Também deu erro no log de erros que fclose() recebeu como parâmetro um booleano 1 em vez de uma resource, ora, isto só confirma aquilo que já sabíamos, ele tentou abrir o ficheiro com o fopen() e como não
 conseguiu, a variável de retorno dessa função deu 1 (houve um problema com a função), pelo que fechar esse ficheiro neste caso é "fechar um valor booleano que simboliza que houve um erro".
+
+No Whireshark, ao abrires o GET responsável pelo /download.php?item=brochure.php, ele devolve uma "espécie de div", mas não sei bem para que serve/o que é; mas é engraçado que aparece uma div igual a uma que aparece no header.php.
+
+
+Eu acho que o footer.php apenas é responsável por mudar os "tipos de moeda" e assim, nota que aquilo tem umas aspas a mais e transforma quase o código todo em string!!
+
+Ora, ele está a tentar criar um ficheiro no servidor de nome x.txt e escrever lá "hello" (eu digo que ele está a tentar escrever
+no servidor porquê: porque o servidor neste caso é a nossa VM, e eu diria que ele está a escrever as cenas no servidor e não localmente),
+ora, ele ao fazer o GET deste ficheiro dá-lhe erro 404 Not Found, ou seja, eu diria que se o ficheiro não existe foi porque ele
+não foi criado!! Ou seja, ele não conseguiu criar / ter permissões para tal!!
+Ele tentou várias vezes descarregar este ficheiro mas nunca conseguiu!!
+
+Ele conseguiu fazer download do Brochure.pdf e index.php (apesar de ele não ter grande coisa)
+Ele conseguiu aceder ao ficheiro config.php (recorrendo ao download.php) e obteve as credenciais de acesso ao servidor:
+<?php
+$host = '127.0.0.1';
+$user = 'root';
+$pass = '1ll-b3-b4ck';
+$database = 'oldstore';
+?>
+
+Ele consegue aceder ao ficheiro display.php e tenta usá-lo para SQL Injection I guess.
+
+WELL WELL WELL...
+No GET /display.php?type=1&lang=php://filter/read=convert.base64-encode/resource=index.php HTTP/1.1" 200 576 "-" "HackToolKit" ele
+basicamente encriptou o conteúdo do ficheiro index.php recorrendo ao campo "lang" do php, ou seja, ele através de SQL Injection ele conseguiu
+fazer isto (o lang é basicamente o campo que permite mudar o tipo de moeda na página)
+
+192.168.1.118 - - [06/Jan/2021:10:01:15 +0000] "GET /index.php HTTP/1.1" 200 791 "-" "bin
+boot
+dev
+etc
+home
+initrd.img
+initrd.img.old
+lib
+lib32
+lib64
+libx32
+lost+found
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+vmlinuz
+vmlinuz.old
+"
+
+Ora bem, vamos lá com calminha: se fores ver o GET /index.php das 10:00:15, vais ver que no lugar de "HackTollKit" está uma web shell inicializada; 
+depois, se fores ver ao whireshark o mesmo GET, vais verificar que no lugar do comando da web shell tens o resultado do comando ls; ora, eu diria
+que então o output é o resultado do comando ls que foi passado como parâmetro no cmd=ls e foi passado ao GET[cmd]; além disso, é interessante
+notar que também no whireshark no GET /display.php?type=1&lang=/var/log/auth.log&cmd=ls%20 aparecem erros de user inválido e o user é
+nada mais nada menos do que o output do ls da máquina!! OMEGUEEEEE
+
+
+
+
 
 
 
