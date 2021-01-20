@@ -261,6 +261,28 @@ e nós supomos que o sys info necessite do conteúdo do lspci, e então, quando 
 após ter sido modificado o lspci 
 
 
+table_catalog
+table_schema
+table_name
+table_type
+tblMembers
+tblProducts
+tblBlogs
+
+No GET /products.php?type=1%20union%20select%201,TABLE_NAME,2,4,%205%20FROM%20INFORMATION_SCHEMA.TABLES HTTP/1.1,
+consegui obter o nome das tabelas existentes (ver tópicos acima)
+
+No GET anterior a este, não consegues ver informações relacionadas às tabelas porque, se fores ver o
+products.php, é ele que está a gerar o html dinamicamente tendo em conta os resultados obtidos; podes
+verificar que ele apenas está a "ir buscar" os primeiros dois atributos do UNION SELECT; assim, ao moveres
+o TABLE_NAME para um dos primeiros atributos, ele vai ser exposto no HTML quando analisares o GET no
+whireshark.
+
+No GET em que ele descarrega o Brochure.pdf, ao abrires no whireshark aparece algo meio "codificado"; eu diria que é o "conteúdo raw"
+do pdf obtido. Se abrires por exemplo no vscode ele vai abrir de maneira meio idêntica.
+
+
+
 
 
 
