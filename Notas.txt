@@ -282,7 +282,8 @@ No GET em que ele descarrega o Brochure.pdf, ao abrires no whireshark aparece al
 do pdf obtido. Se abrires por exemplo no vscode ele vai abrir de maneira meio idêntica.
 
 
-
+Running mount without arguments will output a list of filesystems mounted according to the table of mounted filesystems in /etc/mtab. 
+https://unix.stackexchange.com/questions/91960/can-anyone-explain-the-output-of-mount
 
 
 
