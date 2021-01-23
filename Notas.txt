@@ -289,6 +289,32 @@ https://unix.stackexchange.com/questions/91960/can-anyone-explain-the-output-of-
 
 
 
+--------
+
+Ao fazer mount ele consegue listar os ficheiros do diretorio atual, seguido de um docker ps para saber
+quais so os cotnainers que estao a correr que nao retornou nada, depois ele tentou com o find / -mount listar
+os ficheiros montados desde a raiz, entao podemos dizer que este find não retornou nenhum resultado legível 
+Ele fez um find / -perm 4000 para listar os ficheiros (com permissoes de superuser)  - ficheiros que podem ser executados por um user, que passam a ter as condições
+do user que o criou; a seguir ele testou executar um destes comandos listados (sysinfo) e viu que era possível.
+
+Ele tentou que o servidor fizesse um curl para pedir o ficheiro exploit que tem no seu pc local/no seu terminal e guardou
+no servidor na pasta tmp/lspci; depois mudou as permissoes, tornando este ficheiro executavel, alterou o PATH e executou
+o comando usr/sbin/sysinfo para ver se o ficheiro lspci é executado ao inves do lspci default do sistema (quando executamos
+o lspci o sistema percorrerá a ordem das pastas do PATH da definicao desta variavel de ambiente. 
+
+
+Sendo que ele alterou a ordem do PATH para ter o tmp por ordem, e meteu o seu ficheiro dentro dessa pasta, ele deveria ser executado ao nves
+do ficheiro original, no entanto ele não tem permissoes de execução no tmp devido ao apparmor.d -> consultar isto).
+Pode dizr entao que em seguida ele viu no apparmor.d quem tinha permissoes de execução que no caso de ter permissoes u+x
+era no diretorio usr/local/bin;
+ele copiou o ficheiro lspci para esta nova pasta e executou o comando sysinfo, que desta vez permitiu executar o código mali
+cioso.
+
+
+
+
+
+
 
 
 
